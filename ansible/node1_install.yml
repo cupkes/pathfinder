@@ -1,0 +1,88 @@
+- hosts: node1 
+  remote_user: ec2-user
+  vars:
+   init_heap_size: '512m'
+   max_heap_size: '512000m'
+   page_cache: '15g'
+  tasks:
+    - name: test connection
+      ping:
+      remote_user: ec2-user
+    - name: ensure perl is at the latest version
+      yum:
+       name: perl
+       state: latest
+      become: true
+      become_method: sudo
+    - name: ensure python is at the latest version
+      yum:
+       name: python
+       state: latest
+      become: true
+      become_method: sudo
+    - name: copy script file
+      copy:
+       src: /ansible_files/rpm_update.sh
+       dest: /tmp/rpm_update.sh
+       owner: ec2-user
+       group: ec2-user
+       force: yes
+       mode: 0755
+    - name:  run rpm_update script
+      shell: /tmp/rpm_update.sh
+      args:
+       executable: /bin/bash
+      become: true
+      become_method: sudo
+    - name: get zulu key
+      shell: sudo rpm --import http://repos.azulsystems.com/RPM-GPG-KEY-azulsystems
+      become: true
+      become_method: sudo
+    - name: get zulu package
+      shell: sudo curl -o /etc/yum.repos.d/zulu.repo http://repos.azulsystems.com/rhel/zulu.repo
+      become: true
+      become_method: sudo
+    - name: install one specific version of java
+      shell: yum install -y zulu-8
+      become: true
+      become_method: sudo
+    - name: install one specific version of Neo4j
+      shell: yum install -y neo4j-enterprise-3.4.1
+      become: true
+      become_method: sudo
+    - name: give write access to neo4j directory
+      shell: chmod 777 /etc/neo4j
+      become: true
+      become_method: sudo
+    - name: give write access to neo4j directory
+      shell: chmod 777 /var/lib/neo4j/plugins
+      become: true
+      become_method: sudo
+    - lineinfile:
+       path:  /etc/neo4j/neo4j.conf
+       regexp: '{{item.regex}}'
+       line: '{{item.line}}'
+      with_items:
+      - regex: '^#dbms.memory.heap.initial_size=.*$'
+        line: 'dbms.memory.heap.initial_size={{init_heap_size}}'
+      - regex: '^#dbms.memory.heap.max_size=.*$'
+        line: 'dbms.memory.heap.max_size={{max_heap_size}}'
+      - regex: '^#dbms.memory.pagecache.size=.*$'
+        line: 'dbms.memory.pagecache.size={{page_cache}}'
+      - regex: '^#dbms.connectors.default_listen_address=0.0.0.0.*$'
+        line: 'dbms.connectors.default_listen_address=0.0.0.0'
+
+- hosts: node1 
+  remote_user: ec2-user
+  vars:
+   node: 10.162.48.22
+  tasks:
+    - lineinfile:
+       path:  /etc/neo4j/neo4j.conf
+       regexp: '{{item.regex}}'
+       line: '{{item.line}}'
+      with_items:
+      - regex: '^#dbms.connectors.default_advertised_address=localhost.*$'
+        line: 'dbms.connectors.default_advertised_address={{node}}'
+
+
