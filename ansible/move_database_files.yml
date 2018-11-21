@@ -1,0 +1,15 @@
+- hosts: node1 
+  remote_user: ec2-user
+  vars:
+  tasks:
+     - name: copy graph.db directory
+      copy:
+       src: ./graph.db
+       dest: /var/lib/neo4j/data/databases
+       owner: ec2-user
+       group: ec2-user
+       force: yes
+       mode: 0755
+
+
+
