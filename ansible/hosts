@@ -1,0 +1,63 @@
+# This is the default ansible 'hosts' file.
+#
+# It should live in /etc/ansible/hosts
+#
+#   - Comments begin with the '#' character
+#   - Blank lines are ignored
+#   - Groups of hosts are delimited by [header] elements
+#   - You can enter hostnames or ip addresses
+#   - A hostname/ip can be a member of multiple groups
+
+# Ex 1: Ungrouped hosts, specify before any group headers.
+
+## green.example.com
+## blue.example.com
+## 192.168.100.1
+## 192.168.100.10
+
+# Ex 2: A collection of hosts belonging to the 'webservers' group
+[default]
+ansible_ssh_private_key_file=~/ctest_internal.pem
+
+
+[node1]
+10.1.1.53 ansible_ssh_private_key_file=~/ctest_internal.pem
+[node2]
+10.1.1.55 ansible_ssh_private_key_file=~/ctest_internal.pem
+[node3]
+10.1.1.59 ansible_ssh_private_key_file=~/ctest_internal.pem
+
+[corenodes:children]
+node1
+node2
+node3
+
+[corenodes:vars]
+init_heap_size=10g
+max_heap_size=30g
+pagecache=15g
+init_cluster_size=3
+total_cluster_size=3
+
+
+
+
+# If you have multiple hosts following a pattern you can specify
+# them like this:
+
+## www[001:006].example.com
+
+# Ex 3: A collection of database servers in the 'dbservers' group
+
+## [dbservers]
+## 
+## db01.intranet.mydomain.net
+## db02.intranet.mydomain.net
+## 10.25.1.56
+## 10.25.1.57
+
+# Here's another example of host ranges, this time there are no
+# leading 0s:
+
+## db-[99:101]-node.example.com
+

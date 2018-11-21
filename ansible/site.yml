@@ -1,0 +1,17 @@
+- hosts: localhost
+  vars:
+   int_key: ~/bftree_nc_internal.pem
+  tasks:
+    - debug:
+        msg: site
+- hosts: localhost
+  tasks:
+    - debug:
+        msg: "{{ item }}" 
+      with_items:
+       - "{{ groups['node1'] }}"
+
+
+- name: Include corenodes playbook
+  import_playbook: corenodes.yml
+  
