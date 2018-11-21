@@ -1,0 +1,7 @@
+- hosts: corenodes 
+  remote_user: ec2-user
+  tasks:
+    - name:  stop neo4j database
+      shell: sudo /usr/bin/neo4j stop
+      become: true
+      become_method: sudo
