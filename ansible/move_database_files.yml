@@ -2,14 +2,16 @@
   remote_user: ec2-user
   vars:
   tasks:
-     - name: copy graph.db directory
-      copy:
-       src: ./graph.db
-       dest: /var/lib/neo4j/data/databases
-       owner: ec2-user
-       group: ec2-user
-       force: yes
-       mode: 0755
-
-
-
+    - name:  move graph.db directory
+      shell: mv -f /var/lib/neo4j/data/databases/graph.db /var/lib/neo4j/data/databases/graph.db.bak
+      args:
+       executable: /bin/bash
+      become: true
+      become_method: sudo
+    - name:  copy graph.db directory
+      shell: cp ./graph.db -r /var/lib/neo4j/data/databases
+      args:
+       executable: /bin/bash
+      become: true
+      become_method: sudo
+ 
