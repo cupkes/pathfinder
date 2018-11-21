@@ -1,0 +1,14 @@
+- hosts: node1 
+  remote_user: ec2-user
+  vars:
+  tasks:
+    - name: test connection
+      ping:
+      remote_user: ec2-user
+    - name: ensure perl is at the latest version
+      yum:
+       name: perl
+       state: latest
+      become: true
+      become_method: sudo
+    
